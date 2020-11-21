@@ -1,0 +1,17 @@
+CMakeFiles/
+build/
+gl3w-build/
+gl3w-src/
+glfw-build/
+glfw-src/
+imgui-download/
+imgui-src/
+implot-src/
+proggyfonts-src/
+stb-src/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+imgui_ProggyDotted.cpp
+imgui_ProggyDotted.h
+stb_image.cpp

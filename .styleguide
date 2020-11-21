@@ -1,0 +1,22 @@
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inl$
+  \.inc$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+modifiableFileExclude {
+  portable-file-dialogs\.cpp
+  portable-file-dialogs\.h
+  wpigui\.cpp
+  wpigui\.h
+  wpigui_internal\.h
+  wpigui_opengl3\.cpp
+}
+
+includeOtherLibs {
+}
