@@ -32,4 +32,4 @@ target_compile_options(subsystem-plotter PRIVATE -Wall -pedantic -Wextra -Werror
 target_include_directories(subsystem-plotter PUBLIC src/main/native/include)
 
 # Link to imgui and WPILib.
-target_link_libraries(subsystem-plotter PUBLIC wpigui imgui wpimath ntcore wpiutil)
+target_link_libraries(subsystem-plotter PUBLIC wpigui imgui)
