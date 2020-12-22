@@ -1,90 +1,100 @@
 // Copyright (c) 2020 FRC Team 3512. All Rights Reserved.
 
+#include <filesystem>
+#include <string>
+#include <string_view>
+#include <vector>
+
+#include <fmt/format.h>
 #include <imgui.h>
+#include <implot.h>
 #include <wpigui.h>
 
-#include <cmath>
+#include "FileUtils.hpp"
 
-namespace gui = wpi::gui;
+namespace fs = std::filesystem;
 
+/**
+ * Draw plots for a given subsystem.
+ *
+ * @param subsystem Subsystem name.
+ * @param plotData  Plot data including a list of CSV data files for the
+ *                  subsystem.
+ */
+void DrawPlots(std::string_view subsystem, const PlotData& plotData) {
+    if (ImPlot::BeginPlot("Title")) {
+        fmt::print("draw\n");
+    }
+}
+
+#ifdef _WIN32
+int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
+                      int nCmdShow) {
+#else
 int main() {
-    gui::CreateContext();
-    gui::Initialize("Subsystem plotter", 1024, 768);
-    gui::Texture tex;
-    gui::AddEarlyExecute([&] {
+#endif
+    // Get list of files in current directory
+    std::vector<std::string> files;
+    for (const auto& p : fs::recursive_directory_iterator(".")) {
+        if (std::string_view{p.path().string()}.ends_with(".csv")) {
+            files.push_back(p.path());
+        }
+    }
+    std::sort(files.begin(), files.end());
+
+    auto timestamps = CategorizeFiles(files);
+
+    wpi::gui::CreateContext();
+    ImPlot::CreateContext();
+
+    // Create a unique INI
+    wpi::gui::AddInit(
+        [] { ImGui::GetIO().IniFilename = "subsystem-plotter.ini"; });
+
+    wpi::gui::Initialize("Subsystem plotter", 1024, 768);
+
+    wpi::gui::AddEarlyExecute([&] {
+        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(640, 480), ImGuiCond_FirstUseEver);
         if (ImGui::Begin("Log Viewer")) {
-            if (ImGui::CollapsingHeader("<Timestamp 1 here>")) {
-                ImGuiIO& io = ImGui::GetIO();
-
-                if (ImGui::TreeNode("<Subsystem 1 here>##1")) {
-                    ImGui::CheckboxFlags("<Unit 1 here>##1",
-                                         (unsigned int*)&io.ConfigFlags,
-                                         ImGuiConfigFlags_NavEnableKeyboard);
-                    ImGui::CheckboxFlags("<Unit 2 here>##1",
-                                         (unsigned int*)&io.ConfigFlags,
-                                         ImGuiConfigFlags_NavEnableGamepad);
-                    ImGui::TreePop();
-                    ImGui::Separator();
-                }
-
-                if (ImGui::TreeNode("<Subsystem 2 here>##2")) {
-                    ImGuiBackendFlags backend_flags =
-                        io.BackendFlags;  // Make a local copy to avoid
-                                          // modifying actual back-end flags.
-                    ImGui::CheckboxFlags("io.BackendFlags: HasGamepad",
-                                         (unsigned int*)&backend_flags,
-                                         ImGuiBackendFlags_HasGamepad);
-                    ImGui::CheckboxFlags("io.BackendFlags: HasMouseCursors",
-                                         (unsigned int*)&backend_flags,
-                                         ImGuiBackendFlags_HasMouseCursors);
-                    ImGui::CheckboxFlags("io.BackendFlags: HasSetMousePos",
-                                         (unsigned int*)&backend_flags,
-                                         ImGuiBackendFlags_HasSetMousePos);
-                    ImGui::CheckboxFlags(
-                        "io.BackendFlags: RendererHasVtxOffset",
-                        (unsigned int*)&backend_flags,
-                        ImGuiBackendFlags_RendererHasVtxOffset);
-                    ImGui::TreePop();
-                }
-            }
-
-            if (ImGui::CollapsingHeader("<Timestamp 2 here>")) {
-                ImGuiIO& io = ImGui::GetIO();
-
-                if (ImGui::TreeNode("<Subsystem 1 here>")) {
-                    ImGui::CheckboxFlags("<Unit 1 here>",
-                                         (unsigned int*)&io.ConfigFlags,
-                                         ImGuiConfigFlags_NavEnableKeyboard);
-                    ImGui::CheckboxFlags("<Unit 2 here>",
-                                         (unsigned int*)&io.ConfigFlags,
-                                         ImGuiConfigFlags_NavEnableGamepad);
-                    ImGui::TreePop();
-                    ImGui::Separator();
-                }
-
-                if (ImGui::TreeNode("<Subsystem 2 here>")) {
-                    ImGuiBackendFlags backend_flags =
-                        io.BackendFlags;  // Make a local copy to avoid
-                                          // modifying actual back-end flags.
-                    ImGui::CheckboxFlags("io.BackendFlags: HasGamepad",
-                                         (unsigned int*)&backend_flags,
-                                         ImGuiBackendFlags_HasGamepad);
-                    ImGui::CheckboxFlags("io.BackendFlags: HasMouseCursors",
-                                         (unsigned int*)&backend_flags,
-                                         ImGuiBackendFlags_HasMouseCursors);
-                    ImGui::CheckboxFlags("io.BackendFlags: HasSetMousePos",
-                                         (unsigned int*)&backend_flags,
-                                         ImGuiBackendFlags_HasSetMousePos);
-                    ImGui::CheckboxFlags(
-                        "io.BackendFlags: RendererHasVtxOffset",
-                        (unsigned int*)&backend_flags,
-                        ImGuiBackendFlags_RendererHasVtxOffset);
-                    ImGui::TreePop();
+            for (auto& [timestamp, subsystems] : timestamps) {
+                if (ImGui::CollapsingHeader(timestamp.c_str(),
+                                            ImGuiTreeNodeFlags_DefaultOpen)) {
+                    for (auto& [subsystem, plotData] : subsystems) {
+                        plotData.widgetName =
+                            fmt::format("{}##{}", subsystem, timestamp);
+                        ImGui::Checkbox(plotData.widgetName.c_str(),
+                                        &plotData.isVisible);
+                    }
                 }
             }
         }
         ImGui::End();
+
+        // Draw visible plots
+        for (auto& [timestamp, subsystems] : timestamps) {
+            for (auto& [subsystem, plotData] : subsystems) {
+                // Show plot if it's enabled
+                if (plotData.isVisible) {
+                    fmt::print("timestamp={}\n", timestamp);
+                    fmt::print("subsystem={}\n", subsystem);
+
+                    ImGui::SetNextWindowPos(ImVec2(640, 0),
+                                            ImGuiCond_FirstUseEver);
+                    ImGui::SetNextWindowSize(ImVec2(640, 480),
+                                             ImGuiCond_FirstUseEver);
+                    ImGui::Begin(fmt::format("{} ({})", subsystem.data(),
+                                             timestamp.data())
+                                     .data());
+                    DrawPlots(subsystem,
+                              timestamps[timestamp.data()][subsystem.data()]);
+                    ImGui::End();
+                }
+            }
+        }
     });
-    gui::Main();
+    wpi::gui::Main();
+
+    ImPlot::CreateContext();
+    wpi::gui::DestroyContext();
 }

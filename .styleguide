@@ -9,6 +9,11 @@ cppSrcFileInclude {
   \.cpp$
 }
 
+generatedFileExclude {
+  src/main/native/cpp/fmt/
+  src/main/native/include/fmt/
+}
+
 modifiableFileExclude {
   portable-file-dialogs\.cpp
   portable-file-dialogs\.h
@@ -19,4 +24,8 @@ modifiableFileExclude {
 }
 
 includeOtherLibs {
+  fmt/
+  ^imgui\.h$
+  ^implot\.h$
+  ^wpigui\.h$
 }
