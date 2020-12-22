@@ -38,7 +38,7 @@ int main() {
     wpi::gui::AddInit(
         [] { ImGui::GetIO().IniFilename = "subsystem-plotter.ini"; });
 
-    wpi::gui::Initialize("Subsystem plotter", 1024, 768);
+    wpi::gui::Initialize("Subsystem plotter", 1280, 720);
 
     wpi::gui::AddEarlyExecute([&] {
         ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);

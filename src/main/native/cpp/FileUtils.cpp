@@ -12,27 +12,6 @@
 
 namespace fs = std::filesystem;
 
-SubsystemData::SubsystemData(std::string_view subsystem,
-                             std::string_view timestamp)
-    : subsystem{subsystem},
-      widgetName{fmt::format("{}##{}", subsystem, timestamp)},
-      windowTitle{fmt::format("{} ({})", subsystem, timestamp)} {}
-
-void SubsystemData::Plot() {
-    if (!isVisible) {
-        return;
-    }
-
-    ImGui::SetNextWindowPos(ImVec2(640, 0), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(640, 480), ImGuiCond_FirstUseEver);
-    if (ImGui::Begin(windowTitle.c_str())) {
-        if (ImPlot::BeginPlot("Title")) {
-            ImPlot::EndPlot();
-        }
-        ImGui::End();
-    }
-}
-
 int NumLines(std::string_view filename) {
     std::ifstream file{filename.data()};
     std::string line;
