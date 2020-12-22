@@ -9,18 +9,22 @@
 
 class SubsystemData {
 public:
-    SubsystemData() = default;
-    explicit SubsystemData(const std::vector<std::string>& filenames)
-        : filenames(filenames) {}
+    /**
+     * Constructs a subsystem data container.
+     *
+     * @param subsystem Subsystem name.
+     * @param timestamp Timestamp of subsystem's associated data.
+     */
+    SubsystemData(std::string_view subsystem, std::string_view timestamp);
 
     /**
      * Draw plots.
      */
     void Plot();
 
-    std::string_view timestamp;
-    std::string_view subsystem;
+    std::string subsystem;
     std::string widgetName;
+    std::string windowTitle;
     std::vector<std::string> filenames;
     bool isVisible = false;
 };
@@ -33,23 +37,11 @@ public:
 int NumLines(std::string_view filename);
 
 /**
- * Returns a map with the following structure:
- *
- * {
- *     "timestamp 1": {
- *         "Subsys 1": [filenames],
- *         "Subsys 2": [filenames],
- *     },
- *     "timestamp 2": {
- *         "Subsys 1": [filenames],
- *         "Subsys 2": [filenames],
- *     },
- * }
- *
- * It maps timestamps to key-value pairs of subsystem names (without "states",
- * "inputs", or "outputs") and filename lists.
+ * Returns a map of timestamps to lists of subsystem data. The subsystem for
+ * each timestamp has a list of filenames with the same subsystem name (usually
+ * a list of files ending in "states", "inputs", and "outputs".
  *
  * @param files List of filenames to categorize.
  */
-std::map<std::string, std::map<std::string, SubsystemData>> CategorizeFiles(
+std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
     const std::vector<std::string>& files);

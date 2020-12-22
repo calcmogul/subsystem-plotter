@@ -47,13 +47,9 @@ int main() {
             for (auto& [timestamp, subsystems] : timestamps) {
                 if (ImGui::CollapsingHeader(timestamp.c_str(),
                                             ImGuiTreeNodeFlags_DefaultOpen)) {
-                    for (auto& [subsystem, subsystemData] : subsystems) {
-                        subsystemData.timestamp = timestamp;
-                        subsystemData.subsystem = subsystem;
-                        subsystemData.widgetName =
-                            fmt::format("{}##{}", subsystem, timestamp);
-                        ImGui::Checkbox(subsystemData.widgetName.c_str(),
-                                        &subsystemData.isVisible);
+                    for (auto& subsystem : subsystems) {
+                        ImGui::Checkbox(subsystem.widgetName.c_str(),
+                                        &subsystem.isVisible);
                     }
                 }
             }
@@ -62,8 +58,8 @@ int main() {
 
         // Draw visible plots
         for (auto& [timestamp, subsystems] : timestamps) {
-            for (auto& [subsystem, subsystemData] : subsystems) {
-                subsystemData.Plot();
+            for (auto& subsystem : subsystems) {
+                subsystem.Plot();
             }
         }
     });

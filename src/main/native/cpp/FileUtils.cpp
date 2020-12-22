@@ -12,21 +12,21 @@
 
 namespace fs = std::filesystem;
 
+SubsystemData::SubsystemData(std::string_view subsystem,
+                             std::string_view timestamp)
+    : subsystem{subsystem},
+      widgetName{fmt::format("{}##{}", subsystem, timestamp)},
+      windowTitle{fmt::format("{} ({})", subsystem, timestamp)} {}
+
 void SubsystemData::Plot() {
     if (!isVisible) {
         return;
     }
 
-    fmt::print("timestamp={}\n", timestamp);
-    fmt::print("subsystem={}\n", subsystem);
-
     ImGui::SetNextWindowPos(ImVec2(640, 0), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(640, 480), ImGuiCond_FirstUseEver);
-    std::string title =
-        fmt::format("{} ({})", subsystem.data(), timestamp.data());
-    if (ImGui::Begin(title.c_str())) {
+    if (ImGui::Begin(windowTitle.c_str())) {
         if (ImPlot::BeginPlot("Title")) {
-            fmt::print("draw\n");
             ImPlot::EndPlot();
         }
         ImGui::End();
@@ -45,14 +45,14 @@ int NumLines(std::string_view filename) {
     return lines;
 }
 
-std::map<std::string, std::map<std::string, SubsystemData>> CategorizeFiles(
+std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
     const std::vector<std::string>& files) {
     // First group is name, second group is data type, and third group is date
     std::regex fileRgx{
         "^\\..*?/([A-Za-z ]+) (states|inputs|outputs)-"
         "(\\d{4}-\\d{2}-\\d{2}-\\d{2}_\\d{2}_\\d{2})\\.csv$"};
 
-    std::map<std::string, std::map<std::string, SubsystemData>> timestamps;
+    std::map<std::string, std::vector<SubsystemData>> timestamps;
 
     // Sorting the file list puts files into the order["inputs", "outputs",
     // "states"]. This means data series will be loaded in the order of
@@ -73,9 +73,19 @@ std::map<std::string, std::map<std::string, SubsystemData>> CategorizeFiles(
 
         // If the file is a CSV with the correct name pattern, add it to the
         // list for the associated timestamp.
-        auto timestamp = match[3];
-        auto name = fs::path{match[1]}.filename();
-        timestamps[timestamp][name].filenames.push_back(file);
+        std::string timestamp = match[3];
+        std::string subsystem = fs::path{match[1]}.filename();
+
+        auto& subsystems = timestamps[timestamp];
+        auto it = std::find_if(
+            subsystems.begin(), subsystems.end(),
+            [&](const auto& v) { return v.subsystem == subsystem; });
+        if (it == subsystems.end()) {
+            subsystems.emplace_back(subsystem, timestamp);
+            subsystems.back().filenames.push_back(file);
+        } else {
+            it->filenames.push_back(file);
+        }
     }
 
     return timestamps;
