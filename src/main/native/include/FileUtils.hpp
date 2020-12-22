@@ -7,23 +7,30 @@
 #include <string_view>
 #include <vector>
 
+class SubsystemData {
+public:
+    SubsystemData() = default;
+    explicit SubsystemData(const std::vector<std::string>& filenames)
+        : filenames(filenames) {}
+
+    /**
+     * Draw plots.
+     */
+    void Plot();
+
+    std::string_view timestamp;
+    std::string_view subsystem;
+    std::string widgetName;
+    std::vector<std::string> filenames;
+    bool isVisible = false;
+};
+
 /**
  * Returns number of lines in a file.
  *
  * @param filename Filename.
  */
 int NumLines(std::string_view filename);
-
-class PlotData {
-public:
-    PlotData() = default;
-    explicit PlotData(const std::vector<std::string>& filenames)
-        : filenames(filenames) {}
-
-    std::string widgetName;
-    std::vector<std::string> filenames;
-    bool isVisible = false;
-};
 
 /**
  * Returns a map with the following structure:
@@ -44,5 +51,5 @@ public:
  *
  * @param files List of filenames to categorize.
  */
-std::map<std::string, std::map<std::string, PlotData>> CategorizeFiles(
+std::map<std::string, std::map<std::string, SubsystemData>> CategorizeFiles(
     const std::vector<std::string>& files);

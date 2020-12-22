@@ -14,19 +14,6 @@
 
 namespace fs = std::filesystem;
 
-/**
- * Draw plots for a given subsystem.
- *
- * @param subsystem Subsystem name.
- * @param plotData  Plot data including a list of CSV data files for the
- *                  subsystem.
- */
-void DrawPlots(std::string_view subsystem, const PlotData& plotData) {
-    if (ImPlot::BeginPlot("Title")) {
-        fmt::print("draw\n");
-    }
-}
-
 #ifdef _WIN32
 int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
                       int nCmdShow) {
@@ -60,36 +47,23 @@ int main() {
             for (auto& [timestamp, subsystems] : timestamps) {
                 if (ImGui::CollapsingHeader(timestamp.c_str(),
                                             ImGuiTreeNodeFlags_DefaultOpen)) {
-                    for (auto& [subsystem, plotData] : subsystems) {
-                        plotData.widgetName =
+                    for (auto& [subsystem, subsystemData] : subsystems) {
+                        subsystemData.timestamp = timestamp;
+                        subsystemData.subsystem = subsystem;
+                        subsystemData.widgetName =
                             fmt::format("{}##{}", subsystem, timestamp);
-                        ImGui::Checkbox(plotData.widgetName.c_str(),
-                                        &plotData.isVisible);
+                        ImGui::Checkbox(subsystemData.widgetName.c_str(),
+                                        &subsystemData.isVisible);
                     }
                 }
             }
+            ImGui::End();
         }
-        ImGui::End();
 
         // Draw visible plots
         for (auto& [timestamp, subsystems] : timestamps) {
-            for (auto& [subsystem, plotData] : subsystems) {
-                // Show plot if it's enabled
-                if (plotData.isVisible) {
-                    fmt::print("timestamp={}\n", timestamp);
-                    fmt::print("subsystem={}\n", subsystem);
-
-                    ImGui::SetNextWindowPos(ImVec2(640, 0),
-                                            ImGuiCond_FirstUseEver);
-                    ImGui::SetNextWindowSize(ImVec2(640, 480),
-                                             ImGuiCond_FirstUseEver);
-                    ImGui::Begin(fmt::format("{} ({})", subsystem.data(),
-                                             timestamp.data())
-                                     .data());
-                    DrawPlots(subsystem,
-                              timestamps[timestamp.data()][subsystem.data()]);
-                    ImGui::End();
-                }
+            for (auto& [subsystem, subsystemData] : subsystems) {
+                subsystemData.Plot();
             }
         }
     });
