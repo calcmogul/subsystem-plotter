@@ -36,10 +36,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    container: wpilib/ubuntu-base:18.04
-
     steps:
     - uses: actions/checkout@v2
+
+    - name: Install OpenGL
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install \
+          libgl1-mesa-dev \
+          libglu1-mesa-dev \
+          libx11-dev \
+          libxcursor-dev \
+          libxi-dev \
+          libxinerama-dev \
+          libxrandr-dev
 
     - name: Compile client
       run: |
