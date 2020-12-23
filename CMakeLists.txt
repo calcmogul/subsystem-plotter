@@ -7,17 +7,18 @@ endif()
 project(subsystem-plotter)
 
 add_subdirectory(allwpilib)
+add_subdirectory(fmt)
 
-# Place libraries in lib and binaries in bin.
+# Place libraries in lib and binaries in bin
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# Set C++ standard.
+# Set C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-# Create our main executable.
+# Create our main executable
 file(GLOB_RECURSE subsystem-plotter-sources src/main/native/cpp/*.cpp)
 file(GLOB_RECURSE subsystem-plotter-headers src/main/native/include/*.h)
 
@@ -31,5 +32,5 @@ endif()
 target_compile_options(subsystem-plotter PRIVATE -Wall -pedantic -Wextra -Werror -Wno-unused-parameter -Wno-error=deprecated-declarations)
 target_include_directories(subsystem-plotter PUBLIC src/main/native/include)
 
-# Link to imgui and WPILib.
-target_link_libraries(subsystem-plotter PUBLIC wpigui imgui)
+# Link to imgui and WPILib
+target_link_libraries(subsystem-plotter PUBLIC wpigui imgui fmt)

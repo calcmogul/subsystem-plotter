@@ -1,11 +1,11 @@
 # Download and unpack allwpilib at configure time
 configure_file(CMakeLists.txt.in allwpilib-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND}
-    -G "${CMAKE_GENERATOR}" .
-    RESULT_VARIABLE result
+  -G "${CMAKE_GENERATOR}" .
+  RESULT_VARIABLE result
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/allwpilib-download )
 
-  if(result)
+if(result)
   message(FATAL_ERROR "CMake step for allwpilib failed: ${result}")
 endif()
 execute_process(COMMAND ${CMAKE_COMMAND} --build .
