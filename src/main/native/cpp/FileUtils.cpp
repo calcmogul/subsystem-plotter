@@ -6,10 +6,6 @@
 #include <fstream>
 #include <regex>
 
-#include <fmt/format.h>
-#include <imgui.h>
-#include <implot.h>
-
 namespace fs = std::filesystem;
 
 int NumLines(std::string_view filename) {
