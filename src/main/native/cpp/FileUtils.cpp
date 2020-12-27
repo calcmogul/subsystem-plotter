@@ -2,8 +2,11 @@
 
 #include "FileUtils.hpp"
 
+#include <filesystem>
 #include <fstream>
 #include <regex>
+
+namespace fs = std::filesystem;
 
 int NumLines(std::string_view filename) {
     std::ifstream file{filename.data()};
@@ -19,17 +22,15 @@ int NumLines(std::string_view filename) {
 
 std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
     const std::vector<std::string>& files) {
-    // First group is name, second group is data type, and third group is date
+    // First group is name and second is date
     std::regex fileRgx{
-        "^\\./(.*?/?[A-Za-z ]+) (states|inputs|outputs)-"
+        "^\\./(.*?/?[A-Za-z ]+)-"
         "(\\d{4}-\\d{2}-\\d{2}-\\d{2}_\\d{2}_\\d{2})\\.csv$"};
 
     std::map<std::string, std::vector<SubsystemData>> timestamps;
 
-    // Sorting the file list puts files into the order["inputs", "outputs",
-    // "states"]. This means data series will be loaded in the order of
-    // ["inputs", "outputs", "references", "states"] (references are logged
-    // before states). This produces the desired dataset layering on plots.
+    // If the file is a CSV with the correct name pattern, add it to the list
+    // for the associated timestamp
     for (const auto& file : files) {
         std::smatch match;
         if (!std::regex_search(file, match, fileRgx)) {
@@ -43,16 +44,21 @@ std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
             continue;
         }
 
-        // If the file is a CSV with the correct name pattern, add it to the
-        // list for the associated timestamp.
-        std::string timestamp = match[3];
+        std::string timestamp = match[2];
         std::string subsystem = match[1];
+
+        // Strip everything from the filename after the first space
+        fs::path path{subsystem};
+        auto filename = path.filename().string();
+        subsystem =
+            path.replace_filename(filename.substr(0, filename.find(" ")))
+                .string();
 
         // Shorten CSV paths from simulation or test runs; the standard paths
         // are rather long
-        bool isTest =
-            std::string_view{subsystem}.starts_with("build/test-results/");
-        bool isSim = std::string_view{subsystem}.starts_with("build/install/");
+        std::string_view subsystemView = subsystem;
+        bool isTest = subsystemView.starts_with("build/test-results/");
+        bool isSim = subsystemView.starts_with("build/install/");
         if (isTest || isSim) {
             std::string_view prefix;
             if (isTest) {
@@ -66,7 +72,11 @@ std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
                                                   subsystem.find("release")));
         }
 
+        // Get subsystem list for the file's timestamp
         auto& subsystems = timestamps[timestamp];
+
+        // Add file to the associated subsystem's file list. A new subsystem is
+        // created if none of the existing ones match.
         auto it = std::find_if(
             subsystems.begin(), subsystems.end(),
             [&](const auto& v) { return v.subsystem == subsystem; });

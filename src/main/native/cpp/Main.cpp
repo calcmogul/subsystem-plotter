@@ -27,6 +27,17 @@ int main() {
             files.push_back(p.path());
         }
     }
+
+    // Sorting the file list puts files into the following order:
+    //
+    // ["inputs", "outputs", "states"]
+    //
+    // This means data series will be loaded in the following order, assuming
+    // references are logged before states:
+    //
+    // ["inputs", "outputs", "references", "states"]
+    //
+    // This produces the desired dataset layering on plots.
     std::sort(files.begin(), files.end());
 
     auto timestamps = CategorizeFiles(files);
