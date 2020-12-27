@@ -2,11 +2,8 @@
 
 #include "FileUtils.hpp"
 
-#include <filesystem>
 #include <fstream>
 #include <regex>
-
-namespace fs = std::filesystem;
 
 int NumLines(std::string_view filename) {
     std::ifstream file{filename.data()};
@@ -24,7 +21,7 @@ std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
     const std::vector<std::string>& files) {
     // First group is name, second group is data type, and third group is date
     std::regex fileRgx{
-        "^\\..*?/([A-Za-z ]+) (states|inputs|outputs)-"
+        "^\\./(.*?/?[A-Za-z ]+) (states|inputs|outputs)-"
         "(\\d{4}-\\d{2}-\\d{2}-\\d{2}_\\d{2}_\\d{2})\\.csv$"};
 
     std::map<std::string, std::vector<SubsystemData>> timestamps;
@@ -49,7 +46,25 @@ std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
         // If the file is a CSV with the correct name pattern, add it to the
         // list for the associated timestamp.
         std::string timestamp = match[3];
-        std::string subsystem = fs::path{match[1]}.filename();
+        std::string subsystem = match[1];
+
+        // Shorten CSV paths from simulation or test runs; the standard paths
+        // are rather long
+        bool isTest =
+            std::string_view{subsystem}.starts_with("build/test-results/");
+        bool isSim = std::string_view{subsystem}.starts_with("build/install/");
+        if (isTest || isSim) {
+            std::string_view prefix;
+            if (isTest) {
+                prefix = "test/";
+            } else if (isSim) {
+                prefix = "sim/";
+            }
+
+            subsystem = std::string{prefix} +
+                        subsystem.substr(std::min(subsystem.find("debug"),
+                                                  subsystem.find("release")));
+        }
 
         auto& subsystems = timestamps[timestamp];
         auto it = std::find_if(
