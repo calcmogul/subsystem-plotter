@@ -21,38 +21,32 @@ int NumLines(std::string_view filename) {
 }
 
 std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
-    const std::vector<std::string>& files) {
-    // First group is name and second is date
+    const std::vector<std::string>& filenames) {
+    // First group is subsystem name up to first space, and second group is
+    // timestamp
     std::regex fileRgx{
-        "^\\./(.*?/?[A-Za-z ]+)-"
+        "^\\./(.*?/?[A-Za-z]+) [A-Za-z ]+-"
         "(\\d{4}-\\d{2}-\\d{2}-\\d{2}_\\d{2}_\\d{2})\\.csv$"};
 
     std::map<std::string, std::vector<SubsystemData>> timestamps;
 
     // If the file is a CSV with the correct name pattern, add it to the list
     // for the associated timestamp
-    for (const auto& file : files) {
+    for (const auto& filename : filenames) {
         std::smatch match;
-        if (!std::regex_search(file, match, fileRgx)) {
+        if (!std::regex_search(filename, match, fileRgx)) {
             continue;
         }
 
         // If file is empty or only has header (that is, has no data), ignore
         // it. We ignore the case of one line of data because it might be
         // truncated.
-        if (NumLines(file) <= 2) {
+        if (NumLines(filename) <= 2) {
             continue;
         }
 
         std::string timestamp = match[2];
         std::string subsystem = match[1];
-
-        // Strip everything from the filename after the first space
-        fs::path path{subsystem};
-        auto filename = path.filename().string();
-        subsystem =
-            path.replace_filename(filename.substr(0, filename.find(" ")))
-                .string();
 
         // Shorten CSV paths from simulation or test runs; the standard paths
         // are rather long
@@ -82,9 +76,9 @@ std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
             [&](const auto& v) { return v.subsystem == subsystem; });
         if (it == subsystems.end()) {
             subsystems.emplace_back(subsystem, timestamp);
-            subsystems.back().filenames.push_back(file);
+            subsystems.back().filenames.push_back(filename);
         } else {
-            it->filenames.push_back(file);
+            it->filenames.push_back(filename);
         }
     }
 

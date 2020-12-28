@@ -21,7 +21,7 @@ int NumLines(std::string_view filename);
  * each timestamp has a list of filenames with the same subsystem name (usually
  * a list of files ending in "states", "inputs", and "outputs".
  *
- * @param files List of filenames to categorize.
+ * @param filenames List of filenames to categorize.
  */
 std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
-    const std::vector<std::string>& files);
+    const std::vector<std::string>& filenames);
