@@ -37,7 +37,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-file(GLOB_RECURSE cpp_src src/main/native/cpp/*.cpp)
+file(GLOB_RECURSE cpp_src src/*.cpp)
 add_executable(subsystem-plotter ${cpp_src})
 
 if(APPLE)
@@ -52,5 +52,5 @@ target_compile_options(
     subsystem-plotter
     PRIVATE -Wall -pedantic -Wextra -Werror
 )
-target_include_directories(subsystem-plotter PUBLIC src/main/native/include)
+target_include_directories(subsystem-plotter PUBLIC include)
 target_link_libraries(subsystem-plotter PUBLIC wpigui imgui)
