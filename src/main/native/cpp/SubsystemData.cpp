@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2025 FRC Team 3512. All Rights Reserved.
+// Copyright (c) Tyler Veness
 
 #include "SubsystemData.hpp"
 
