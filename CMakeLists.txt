@@ -37,38 +37,20 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+file(GLOB_RECURSE cpp_src src/main/native/cpp/*.cpp)
+add_executable(subsystem-plotter ${cpp_src})
 
-# Create our main executable
-file(GLOB_RECURSE subsystem-plotter-sources src/main/native/cpp/*.cpp)
-file(GLOB_RECURSE subsystem-plotter-headers src/main/native/include/*.h)
-
-add_executable(
-    subsystem-plotter
-    ${subsystem-plotter-sources}
-    ${subsystem-plotter-headers}
-)
 if(APPLE)
     set_target_properties(
         subsystem-plotter
         PROPERTIES LINK_FLAGS "-framework Metal -framework QuartzCore"
     )
-else()
-    target_link_libraries(subsystem-plotter PUBLIC stdc++fs)
 endif()
 
+target_compile_features(subsystem-plotter PUBLIC cxx_std_23)
 target_compile_options(
     subsystem-plotter
-    PRIVATE
-        -Wall
-        -pedantic
-        -Wextra
-        -Werror
-        -Wno-unused-parameter
-        -Wno-error=deprecated-declarations
+    PRIVATE -Wall -pedantic -Wextra -Werror
 )
 target_include_directories(subsystem-plotter PUBLIC src/main/native/include)
-
-# Link to imgui and WPILib
 target_link_libraries(subsystem-plotter PUBLIC wpigui imgui)
