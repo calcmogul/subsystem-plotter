@@ -12,12 +12,10 @@
 
 #include "FileUtils.hpp"
 
-namespace fs = std::filesystem;
-
 int main() {
     // Get list of files in current directory
     std::vector<std::string> files;
-    for (const auto& p : fs::recursive_directory_iterator(".")) {
+    for (const auto& p : std::filesystem::recursive_directory_iterator(".")) {
         if (std::string_view{p.path().string()}.ends_with(".csv")) {
             files.push_back(p.path().string());
         }
