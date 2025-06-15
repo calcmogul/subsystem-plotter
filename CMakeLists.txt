@@ -11,7 +11,26 @@ if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
     set(CMAKE_EXPORT_COMPILE_COMMANDS "YES" CACHE STRING "" FORCE)
 endif()
 
-add_subdirectory(allwpilib)
+include(FetchContent)
+
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(WITH_CSCORE OFF CACHE INTERNAL "With CSCore")
+set(WITH_GUI ON CACHE INTERNAL "With GUI")
+set(WITH_JAVA OFF CACHE INTERNAL "With Java")
+set(WITH_NTCORE ON CACHE INTERNAL "With NTCore")
+set(WITH_PROTOBUF OFF CACHE BOOL "" FORCE)
+set(WITH_SIMULATION_MODULES OFF CACHE INTERNAL "With Simulation Modules")
+set(WITH_TESTS OFF CACHE INTERNAL "With Tests")
+set(WITH_WPILIB OFF CACHE INTERNAL "With WPILib")
+set(WITH_WPIMATH ON CACHE INTERNAL "With WPIMath")
+fetchcontent_declare(
+    wpilib
+    GIT_REPOSITORY https://github.com/wpilibsuite/allwpilib.git
+    GIT_TAG v2025.3.2
+    EXCLUDE_FROM_ALL
+    SYSTEM
+)
+fetchcontent_makeavailable(wpilib)
 
 # Place libraries in lib and binaries in bin
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
