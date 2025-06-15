@@ -19,11 +19,11 @@ public:
     /**
      * Draw plots.
      */
-    void Plot();
+    void plot();
 
     std::string subsystem;
-    std::string widgetName;
-    std::string windowTitle;
+    std::string widget_name;
+    std::string window_title;
     std::vector<std::string> filenames;
-    bool isVisible = false;
+    bool is_visible = false;
 };

@@ -1,6 +1,6 @@
 // Copyright (c) Tyler Veness
 
-#include "FileUtils.hpp"
+#include "file_utils.hpp"
 
 #include <algorithm>
 #include <fstream>
@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-int NumLines(std::string_view filename) {
+int num_lines(std::string_view filename) {
     std::ifstream file{filename.data()};
     std::string line;
 
@@ -21,7 +21,7 @@ int NumLines(std::string_view filename) {
     return lines;
 }
 
-std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
+std::map<std::string, std::vector<SubsystemData>> categorize_files(
     const std::vector<std::string>& filenames) {
     // First group is subsystem name up to first space, and second group is
     // timestamp
@@ -42,7 +42,7 @@ std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
         // If file is empty or only has header (that is, has no data), ignore
         // it. We ignore the case of one line of data because it might be
         // truncated.
-        if (NumLines(filename) <= 2) {
+        if (num_lines(filename) <= 2) {
             continue;
         }
 
@@ -51,14 +51,14 @@ std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
 
         // Shorten CSV paths from simulation or test runs; the standard paths
         // are rather long
-        std::string_view subsystemView = subsystem;
-        bool isTest = subsystemView.starts_with("build/test-results/");
-        bool isSim = subsystemView.starts_with("build/install/");
-        if (isTest || isSim) {
+        std::string_view subsystem_view = subsystem;
+        bool is_test = subsystem_view.starts_with("build/test-results/");
+        bool is_sim = subsystem_view.starts_with("build/install/");
+        if (is_test || is_sim) {
             std::string_view prefix;
-            if (isTest) {
+            if (is_test) {
                 prefix = "test/";
-            } else if (isSim) {
+            } else if (is_sim) {
                 prefix = "sim/";
             }
 

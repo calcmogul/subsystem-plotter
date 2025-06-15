@@ -7,14 +7,14 @@
 #include <string_view>
 #include <vector>
 
-#include "SubsystemData.hpp"
+#include "subsystem_data.hpp"
 
 /**
  * Returns number of lines in a file.
  *
  * @param filename Filename.
  */
-int NumLines(std::string_view filename);
+int num_lines(std::string_view filename);
 
 /**
  * Returns a map of timestamps to lists of subsystem data. The subsystem for
@@ -23,5 +23,5 @@ int NumLines(std::string_view filename);
  *
  * @param filenames List of filenames to categorize.
  */
-std::map<std::string, std::vector<SubsystemData>> CategorizeFiles(
+std::map<std::string, std::vector<SubsystemData>> categorize_files(
     const std::vector<std::string>& filenames);

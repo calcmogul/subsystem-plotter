@@ -9,7 +9,7 @@
 #include <implot.h>
 #include <wpigui.h>
 
-#include "FileUtils.hpp"
+#include "file_utils.hpp"
 
 int main() {
     // Get list of files in current directory
@@ -32,7 +32,7 @@ int main() {
     // This produces the desired dataset layering on plots.
     std::sort(files.begin(), files.end());
 
-    auto timestamps = CategorizeFiles(files);
+    auto timestamps = categorize_files(files);
 
     wpi::gui::CreateContext();
     ImPlot::CreateContext();
@@ -51,8 +51,8 @@ int main() {
                 if (ImGui::CollapsingHeader(timestamp.c_str(),
                                             ImGuiTreeNodeFlags_DefaultOpen)) {
                     for (auto& subsystem : subsystems) {
-                        ImGui::Checkbox(subsystem.widgetName.c_str(),
-                                        &subsystem.isVisible);
+                        ImGui::Checkbox(subsystem.widget_name.c_str(),
+                                        &subsystem.is_visible);
                     }
                 }
             }
@@ -62,7 +62,7 @@ int main() {
         // Draw visible plots
         for (auto& [timestamp, subsystems] : timestamps) {
             for (auto& subsystem : subsystems) {
-                subsystem.Plot();
+                subsystem.plot();
             }
         }
     });

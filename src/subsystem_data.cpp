@@ -1,6 +1,6 @@
 // Copyright (c) Tyler Veness
 
-#include "SubsystemData.hpp"
+#include "subsystem_data.hpp"
 
 #include <format>
 
@@ -10,17 +10,17 @@
 SubsystemData::SubsystemData(std::string_view subsystem,
                              std::string_view timestamp)
     : subsystem{subsystem},
-      widgetName{std::format("{}##{}", subsystem, timestamp)},
-      windowTitle{std::format("{} ({})", subsystem, timestamp)} {}
+      widget_name{std::format("{}##{}", subsystem, timestamp)},
+      window_title{std::format("{} ({})", subsystem, timestamp)} {}
 
-void SubsystemData::Plot() {
-    if (!isVisible) {
+void SubsystemData::plot() {
+    if (!is_visible) {
         return;
     }
 
     ImGui::SetNextWindowPos(ImVec2(640, 0), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(640, 480), ImGuiCond_FirstUseEver);
-    if (ImGui::Begin(windowTitle.c_str())) {
+    if (ImGui::Begin(window_title.c_str())) {
         // TODO: Loop over units, making a new plot for each. See open_figs() in
         // subsystem_plotter.py.
         if (ImPlot::BeginPlot("Title")) {
