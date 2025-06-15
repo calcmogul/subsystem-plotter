@@ -6,7 +6,6 @@
 #include <string_view>
 #include <vector>
 
-#include <fmt/format.h>
 #include <imgui.h>
 #include <implot.h>
 #include <wpigui.h>

@@ -2,15 +2,16 @@
 
 #include "SubsystemData.hpp"
 
-#include <fmt/format.h>
+#include <format>
+
 #include <imgui.h>
 #include <implot.h>
 
 SubsystemData::SubsystemData(std::string_view subsystem,
                              std::string_view timestamp)
     : subsystem{subsystem},
-      widgetName{fmt::format("{}##{}", subsystem, timestamp)},
-      windowTitle{fmt::format("{} ({})", subsystem, timestamp)} {}
+      widgetName{std::format("{}##{}", subsystem, timestamp)},
+      windowTitle{std::format("{} ({})", subsystem, timestamp)} {}
 
 void SubsystemData::Plot() {
     if (!isVisible) {
