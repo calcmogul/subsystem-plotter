@@ -7,41 +7,62 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Fetch all history and metadata
-      run: |
-        git checkout -b pr
-        git branch -f main origin/main
+      - name: Fetch all history and metadata
+        run: |
+          git checkout -b pr
+          git branch -f main origin/main
 
-    - uses: actions/setup-python@v5
-      with:
-        python-version: 3.13
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
 
-    - run: pip3 install wpiformat==2025.33
-    - run: wpiformat
+      - run: pip3 install wpiformat==2025.33
+      - run: wpiformat
 
-    - name: Verify wpiformat made no changes
-      run: git --no-pager diff --exit-code HEAD
+      - name: Verify wpiformat made no changes
+        run: git --no-pager diff --exit-code HEAD
 
   build:
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows x86_64
+            os: windows-2022
+            cmake-args:
+          - name: Linux x86_64
+            os: ubuntu-24.04
+            cmake-args:
+          - name: Linux aarch64
+            os: ubuntu-24.04-arm
+            cmake-args:
+          - name: macOS universal
+            os: macOS-14
+            cmake-args: -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
+
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Install OpenGL
-      run: |
-        sudo apt-get update -q
-        sudo apt-get install -y \
-          libgl1-mesa-dev \
-          libglu1-mesa-dev \
-          libssh-dev \
-          libx11-dev \
-          libxcursor-dev \
-          libxi-dev \
-          libxinerama-dev \
-          libxrandr-dev
-    - run: cmake -B build -S .
-    - run: cmake --build build
+      - uses: actions/checkout@v4
+
+      - name: Install OpenGL (Linux)
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y \
+            libgl1-mesa-dev \
+            libglu1-mesa-dev \
+            libssh-dev \
+            libx11-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libxinerama-dev \
+            libxrandr-dev
+
+      - run: cmake -B build -S . ${{ matrix.cmake-args }}
+      - run: cmake --build build

@@ -14,17 +14,12 @@
 
 namespace fs = std::filesystem;
 
-#ifdef _WIN32
-int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
-                      int nCmdShow) {
-#else
 int main() {
-#endif
     // Get list of files in current directory
     std::vector<std::string> files;
     for (const auto& p : fs::recursive_directory_iterator(".")) {
         if (std::string_view{p.path().string()}.ends_with(".csv")) {
-            files.push_back(p.path());
+            files.push_back(p.path().string());
         }
     }
 
@@ -78,4 +73,15 @@ int main() {
 
     ImPlot::CreateContext();
     wpi::gui::DestroyContext();
+
+#ifdef _WIN32
+    return 0;
+#endif
 }
+
+#ifdef _WIN32
+int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
+                      int nCmdShow) {
+    return main();
+}
+#endif

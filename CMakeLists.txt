@@ -48,9 +48,15 @@ if(APPLE)
 endif()
 
 target_compile_features(subsystem-plotter PUBLIC cxx_std_23)
-target_compile_options(
-    subsystem-plotter
-    PRIVATE -Wall -pedantic -Wextra -Werror
-)
+if(NOT MSVC)
+    target_compile_options(
+        subsystem-plotter
+        PRIVATE -Wall -pedantic -Wextra -Werror
+    )
+else()
+    # Suppress the following warnings:
+    #   * C4244: lossy conversion
+    target_compile_options(subsystem-plotter PRIVATE /wd4244 /WX)
+endif()
 target_include_directories(subsystem-plotter PUBLIC include)
 target_link_libraries(subsystem-plotter PUBLIC wpigui imgui)
