@@ -1,5 +1,6 @@
-// Copyright (c) 2020 FRC Team 3512. All Rights Reserved.
+// Copyright (c) 2020-2025 FRC Team 3512. All Rights Reserved.
 
+#include <algorithm>
 #include <filesystem>
 #include <string>
 #include <string_view>

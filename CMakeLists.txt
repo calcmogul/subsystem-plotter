@@ -1,10 +1,15 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.21)
 
-if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
-  message(FATAL_ERROR "In-source builds are not allowed.")
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+    message(FATAL_ERROR "In-source builds are not allowed.")
 endif()
 
 project(subsystem-plotter)
+
+# Generate compile_commands.json by default
+if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS "YES" CACHE STRING "" FORCE)
+endif()
 
 add_subdirectory(allwpilib)
 add_subdirectory(fmt)
@@ -21,14 +26,30 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 file(GLOB_RECURSE subsystem-plotter-sources src/main/native/cpp/*.cpp)
 file(GLOB_RECURSE subsystem-plotter-headers src/main/native/include/*.h)
 
-add_executable(subsystem-plotter ${subsystem-plotter-sources} ${subsystem-plotter-headers})
-if (APPLE)
-  set_target_properties(subsystem-plotter PROPERTIES LINK_FLAGS "-framework Metal -framework QuartzCore")
+add_executable(
+    subsystem-plotter
+    ${subsystem-plotter-sources}
+    ${subsystem-plotter-headers}
+)
+if(APPLE)
+    set_target_properties(
+        subsystem-plotter
+        PROPERTIES LINK_FLAGS "-framework Metal -framework QuartzCore"
+    )
 else()
-  target_link_libraries(subsystem-plotter PUBLIC stdc++fs)
+    target_link_libraries(subsystem-plotter PUBLIC stdc++fs)
 endif()
 
-target_compile_options(subsystem-plotter PRIVATE -Wall -pedantic -Wextra -Werror -Wno-unused-parameter -Wno-error=deprecated-declarations)
+target_compile_options(
+    subsystem-plotter
+    PRIVATE
+        -Wall
+        -pedantic
+        -Wextra
+        -Werror
+        -Wno-unused-parameter
+        -Wno-error=deprecated-declarations
+)
 target_include_directories(subsystem-plotter PUBLIC src/main/native/include)
 
 # Link to imgui and WPILib

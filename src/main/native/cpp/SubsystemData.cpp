@@ -1,10 +1,10 @@
-// Copyright (c) 2020 FRC Team 3512. All Rights Reserved.
+// Copyright (c) 2020-2025 FRC Team 3512. All Rights Reserved.
+
+#include "SubsystemData.hpp"
 
 #include <fmt/format.h>
 #include <imgui.h>
 #include <implot.h>
-
-#include "FileUtils.hpp"
 
 SubsystemData::SubsystemData(std::string_view subsystem,
                              std::string_view timestamp)

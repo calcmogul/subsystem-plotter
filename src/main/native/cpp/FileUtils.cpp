@@ -1,12 +1,13 @@
-// Copyright (c) 2020 FRC Team 3512. All Rights Reserved.
+// Copyright (c) 2020-2025 FRC Team 3512. All Rights Reserved.
 
 #include "FileUtils.hpp"
 
-#include <filesystem>
+#include <algorithm>
 #include <fstream>
+#include <map>
 #include <regex>
-
-namespace fs = std::filesystem;
+#include <string>
+#include <vector>
 
 int NumLines(std::string_view filename) {
     std::ifstream file{filename.data()};
