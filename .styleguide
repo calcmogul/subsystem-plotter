@@ -1,30 +1,12 @@
 cppHeaderFileInclude {
-  \.h$
   \.hpp$
-  \.inl$
-  \.inc$
 }
 
 cppSrcFileInclude {
   \.cpp$
 }
 
-generatedFileExclude {
-  src/main/native/cpp/fmt/
-  src/main/native/include/fmt/
-}
-
-modifiableFileExclude {
-  portable-file-dialogs\.cpp
-  portable-file-dialogs\.h
-  wpigui\.cpp
-  wpigui\.h
-  wpigui_internal\.h
-  wpigui_opengl3\.cpp
-}
-
 includeOtherLibs {
-  fmt/
   ^imgui\.h$
   ^implot\.h$
   ^wpigui\.h$
